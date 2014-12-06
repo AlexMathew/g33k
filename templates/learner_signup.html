@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>G33K - Sign up as a Learner</title>
+		<link rel="stylesheet" href="/static/css/foundation.min.css">
+		<link rel="stylesheet" href="/static/css/normalize.css">
+		<link rel="stylesheet" type="text/css" href="/static/css/signup.css">
+	</head>
+	<body style="background-color: #EEEEEE">
+		<div class="row">
+			<div class="large-6 columns">
+				<div class="signup-panel">
+					<p class="welcome"> Sign up as a G33K Learner</p>
+					<form action="{{ url_for('verify_learnersignup') }}" method=post>
+						<div class="row collapse">
+							<div class="small-12  columns">
+								<input type="text" placeholder="Username">
+							</div>
+						</div>
+						<div class="row collapse">
+							<div class="small-12  columns">
+								<input type="text" placeholder="Email">
+							</div>
+						</div>
+						<div class="row collapse">
+							<div class="small-12 columns ">
+								<input type="password" placeholder="Password">
+							</div>
+						</div>
+						<div class="row">
+							<div class="small-12 columns">
+								Time to pick your squad ! <a href="#" data-reveal-id="myModal">Click here</a> to see the available list of characters, and their corresponding skill values (on a scale of 10). Your squad should consist of 5 members. Fill in the 5 in the text area below, as comma separated names (please capitalize the first letter). Give your squad a name, and you're good to go !
+							</div>
+						</div>
+						<div class="row">
+						    <div class="large-12 columns">
+						    	<textarea placeholder="Your squad"></textarea>
+						    </div>
+						</div>
+						<div class="row collapse">
+							<div class="small-12  columns">
+								<input type="text" placeholder="Squad name">
+							</div>
+						</div>
+						<button class="button">Sign up</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div id="myModal" class="reveal-modal" data-reveal>
+		<table>
+			<thead>
+				<tr>
+					<th width="200">Name</th>
+					<th width="100">Gender</th>
+					<th>Skills - Web</th>
+					<th>Skills - Mobile</th>
+					<th>Skills - Design</th>
+					<th>Skills - Databases</th>
+					<th>Skills - Systems</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for character in characters %}
+				<tr>
+					<td>{{ character['name'] }}</td>
+					<td>{{ character['gender'] }}</td>
+					<td>{{ character['skills-web'] }}</td>
+					<td>{{ character['skills-mobile'] }}</td>
+					<td>{{ character['skills-design'] }}</td>
+					<td>{{ character['skills-databases'] }}</td>
+					<td>{{ character['skills-systems'] }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		</div>     
+		<script src="/static/js/jquery.js"></script>
+		<script src="/static/js/foundation.js"></script>
+		<script src="/static/js/foundation.reveal.js"></script>
+		<script>$(document).foundation();</script>
+	</body>
+</html>

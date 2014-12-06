@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>G33K - Sign up as a Trainer</title>
+		<link rel="stylesheet" href="/static/css/foundation.min.css">
+		<link rel="stylesheet" href="/static/css/normalize.css">
+		<link rel="stylesheet" type="text/css" href="/static/css/signup.css">
+	</head>
+	<body style="background-color: #EEEEEE">
+		<div class="row">
+			<div class="large-6 columns">
+				<div class="signup-panel">
+					<p class="welcome"> Sign up as a G33K Trainer</p>
+					<form action="{{ url_for('verify_trainersignup') }}" method=post>
+						<div class="row collapse">
+							<div class="small-12  columns">
+								<input type="text" placeholder="Username">
+							</div>
+						</div>
+						<div class="row collapse">
+							<div class="small-12  columns">
+								<input type="text" placeholder="Email">
+							</div>
+						</div>
+						<div class="row collapse">
+							<div class="small-12 columns ">
+								<input type="password" placeholder="Password">
+							</div>
+						</div>
+						<button class="button">Sign up</button>
+					</form>
+				</div>
+			</div>
+		</div>     
+	</body>
+</html>
