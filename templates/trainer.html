@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>G33K Trainer</title>
+		<link rel="stylesheet" href="/static/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" type="text/css" href="/static/css/geek.css">
+		<script src="/static/js/bootstrap.min.js"></script>
+	</head>
+	<body style="background-color: #EEEEEE">
+		<div id="about" class="pad-section">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-6 text-center">
+						<h1>I am a G33K Trainer</h3>
+						<form action="{{ url_for('auth_trainer') }}" method=post>
+							<label class="sr-only" for="inputUsername">Username</label>
+							<input id="inputUsername" class="form-control" type="username" autofocus="" required="" placeholder="Username">
+							<label class="sr-only" for="inputPassword">Password</label>
+							<input id="inputPassword" class="form-control" type="password" required="" placeholder="Password">
+							<div style="padding: 5px; margin: 5px"> </div>
+							<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+						</form>						
+					</div>
+					<div class="col-sm-6 text-center">
+						<h1>I want to be a G33K Trainer</h3>
+	                    <a href="/trainer_signup" style="text-decoration: none; font-size: 3em; align: center">Let's go !</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
