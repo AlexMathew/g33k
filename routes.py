@@ -1,13 +1,17 @@
 from flask import Flask, render_template, redirect, request, session, escape, url_for, \
 				  flash
+import os				  
 import pymongo
 
 app = Flask(__name__)
+app.secret_key = os.environ['SECRET_KEY']
 db = pymongo.Connection("mongodb://localhost").g33k
 
 
 @app.route('/')
 def home():
+	if 'username' in session:
+		return render_template('index.html')
 	return render_template('home.html')
 
 
@@ -32,24 +36,92 @@ def learner_signup():
 	return render_template('learner_signup.html', characters=characters)
 
 
-@app.route('/authenticate_trainer')
+@app.route('/authenticate_trainer', methods=['POST'])
 def auth_trainer():
-	return render_template('profile.html')
+	return render_template('home.html')
 
 
-@app.route('/authenticate_learner')
+@app.route('/authenticate_learner', methods=['POST'])
 def auth_learner():
-	return render_template('profile.html')
+	return render_template('home.html')
 
 
-@app.route('/verify_trainersignup')
+@app.route('/verify_trainersignup', methods=['POST'])
 def verify_trainersignup():
-	return
+	username = request.form['username']
+	email = request.form['email']
+	password = request.form['password']
+	trainers = db.trainers
+	if trainers.find_one({ '_id': username }) is None:
+		trainers.insert({
+			'_id': username,
+			'email': email,
+			'password': hash(password)
+			})
+		session['username'] = username
+		session['type'] = 'trainer'
+		return redirect('index')
+	else:
+		flash('The username "%s" is already taken' % (username))
+		return redirect('trainer_signup')
 
 
-@app.route('/verify_learnersignup')
+@app.route('/verify_learnersignup', methods=['POST'])
 def verify_learnersignup():
-	return
+	username = request.form['username']
+	email = request.form['email']
+	password = request.form['password']
+	squad = request.form['squad']
+	squadname = request.form['squadname']
+	resignup = False
+	learners = db.learners
+	if learners.find_one({ '_id': username }) is not None:
+		resignup = True
+		flash('The username "%s" is already taken' % (username))
+	members = set([name.strip().title() for name in squad.split(',')])
+	if len(members) is not 5:
+		resignup = True
+		flash('You should have exactly 5 members in your squad')
+	characters = {result['name'] for result in db.characters.find({}, {'_id': 0, 'name': 1})}
+	if len(members - characters) != 0:
+		resignup = True
+		flash('You should have members only from the list given')
+	if resignup:
+		return redirect('learner_signup')
+	else:
+		squadstats = [db.characters.find_one({'name': member}) for member in members]
+		learners.insert({
+			'_id': username,
+			'email': email,
+			'password': hash(password),
+			'squadname': squadname,
+			'squad': [
+				{
+					'name': member['name'],
+					'skills-web': member['skills-web'],
+					'skills-mobile': member['skills-mobile'],
+					'skills-design': member['skills-design'],
+					'skills-databases': member['skills-databases'],
+					'skills-systems': member['skills-systems']
+				}
+				for member in squadstats
+				]
+			})
+		session['username'] = username
+		session['type'] = 'learner'
+		return redirect('index')
+
+
+@app.route('/index')
+def index():
+	return render_template('index.html')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    session.pop('type', None)
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':

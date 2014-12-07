@@ -11,20 +11,31 @@
 			<div class="large-6 columns">
 				<div class="signup-panel">
 					<p class="welcome"> Sign up as a G33K Learner</p>
+					{% with messages = get_flashed_messages() %}
+					  {% if messages %}
+					    <ul class=flashes>
+					    {% for message in messages %}
+					      <div data-alert class="alert-box alert round">
+					      	{{ message }}
+					      </div>
+					    {% endfor %}
+					    </ul>
+					  {% endif %}
+					{% endwith %}					
 					<form action="{{ url_for('verify_learnersignup') }}" method=post>
 						<div class="row collapse">
 							<div class="small-12  columns">
-								<input type="text" placeholder="Username">
+								<input type="text" placeholder="Username" name="username">
 							</div>
 						</div>
 						<div class="row collapse">
 							<div class="small-12  columns">
-								<input type="text" placeholder="Email">
+								<input type="text" placeholder="Email" name="email">
 							</div>
 						</div>
 						<div class="row collapse">
 							<div class="small-12 columns ">
-								<input type="password" placeholder="Password">
+								<input type="password" placeholder="Password" name="password">
 							</div>
 						</div>
 						<div class="row">
@@ -34,12 +45,12 @@
 						</div>
 						<div class="row">
 						    <div class="large-12 columns">
-						    	<textarea placeholder="Your squad"></textarea>
+						    	<textarea placeholder="Your squad" name="squad"></textarea>
 						    </div>
 						</div>
 						<div class="row collapse">
 							<div class="small-12  columns">
-								<input type="text" placeholder="Squad name">
+								<input type="text" placeholder="Squad name" name="squadname">
 							</div>
 						</div>
 						<button class="button">Sign up</button>
