@@ -101,11 +101,12 @@ def verify_trainersignup():
             '_id': username,
             'name': name,
             'email': email,
-            'password': hash(password)
+            'password': hash(password),
+            'tutorials': []
             })
         session['username'] = username
         session['type'] = 'trainer'
-        mailgun(email, 'trainer')
+        mailgun(email, name, 'trainer')
         return redirect('index')
     else:
         flash('The username "%s" is already taken' % (username))
@@ -125,7 +126,7 @@ def verify_learnersignup():
     if learners.find_one({ '_id': username }) is not None:
         resignup = True
         flash('The username "%s" is already taken' % (username))
-    members = set([name.strip().title() for name in squad.split(',')])
+    members = set([person.strip().title() for person in squad.split(',')])
     if len(members) is not 5:
         resignup = True
         flash('You should have exactly 5 members in your squad')
@@ -157,7 +158,7 @@ def verify_learnersignup():
             })
         session['username'] = username
         session['type'] = 'learner'
-        mailgun(email, 'learner')
+        mailgun(email, name, 'learner')
         return redirect('index')
 
 
@@ -173,18 +174,46 @@ def index():
 
 @app.route('/trainer/<username>')
 def trainerprofile(username):
-    return render_template('trainerprofile.html')
+    person = db.trainers.find_one({ '_id': username })
+    if person is None:
+        error = True
+        details = {'username': username}
+    else:
+        error = False
+        details = {
+            'name': person['name'],
+            'tutorials': person['tutorials'],
+            'tutorialcount': len(person['tutorials'])
+        }
+    return render_template('trainerprofile.html', error=error, details=details)
 
 
 @app.route('/learner/<username>')
 def learnerprofile(username):
-    return render_template('learnerprofile.html')
+    person = db.learners.find_one({ '_id': username })
+    if person is None:
+        error = True
+        details = {'username': username}
+    else:
+        error = False
+        details = {
+            'name': person['name'],
+            'squadname': person['squadname'],
+            'squad': person['squad']
+        }
+    return render_template('learnerprofile.html', error=error, details=details)
 
 
 @app.route('/profile')
 @login_required
 def profile():
     return redirect(url_for(session['type'] + 'profile', username=session['username']))
+
+
+@app.route('/search/<type>', methods=['POST'])
+def search(type):
+    searchterm = request.form['term']
+    return redirect(url_for(type + 'profile', username=searchterm))
 
 
 @app.route('/logout')
