@@ -241,18 +241,24 @@ def search(type):
 
 def generate_permalink(title, today):
     import re
-    year, month, day = str(today.year), str(today.month), str(today.day)
     title = title.strip()
     pattern = re.compile("[^\w ]")
     templink = re.sub(pattern, '', title).replace(" ", "_")
-    permalink = "_".join([year, month, day, templink])
+    permalink = "_".join([timestamp, templink])
     return permalink
 
 
 def convertmdtohtml(content):
+    # Thank you StackOverflow !
+    import urllib2, json
+    data = {'text': content}
+    json_data = json.dumps(data)
+    req = urllib2.Request("https://api.github.com/markdown")
+    result = urllib2.urlopen(req, json_data)
+    html = '\n'.join(result.readlines())
     return html
 
-    
+
 @app.route('/addtutorial', methods=['GET', 'POST'])
 @trainer_login_required
 def addtutorial():
@@ -268,10 +274,43 @@ def addtutorial():
     category = request.form['category']
     skillincrease = float(request.form['skillincrease'])
     title = request.form['title']
-    today = datetime.date.today()
-    date = today.ctime()
-    permalink = generate_permalink(title, today)
+    date = datetime.date.today().ctime()
+    permalink = generate_permalink(title, timestamp)
     content = request.form['content']
+    html = convertmdtohtml(content)
+    html = "{% extends \"tutorial.html\" %}\n{% block content %}\n" + html + "\n{% endblock %}"
+    with open('templates/tutorials/' + str(timestamp) + '.html', 'w') as f:
+        f.write(html)
+    trainer_data = {
+        'permalink': permalink,
+        'title': title,
+        'date': date
+        }
+    tutorial_data = {
+        'timestamp': timestamp,
+        'author_name': author_name,
+        'author_username': author_username,
+        'category': category,
+        'skillincrease': skillincrease,
+        'title': title,
+        'date': date,
+        'permalink': permalink
+        }
+    db.tutorials.insert(tutorial_data)
+    db.trainers.update(
+        { '_id': author_username },
+        { '$set': { 'tutorials': { '$push': trainer_data } } }
+        )
+    with open('templates/index.html') as f:
+        indexpage = f.read()
+    indexpage = indexpage.replace(
+        '<h3>G33K Activity</h3>',
+        '<h3>G33K Activity</h3>\n<li class="list-group-item"> \
+        <a href="/trainer/%s">%s</a> posted a new tutorial - \
+        <a href="/%s">%s</a></li>' % (author_username, author_name, permalink, title)
+        )
+    with open('templates/index.html', 'w') as f:
+        f.write()
     return redirect('index')
 
 

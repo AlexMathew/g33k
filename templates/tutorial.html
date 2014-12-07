@@ -1,0 +1,8 @@
+{% extends "template.html" %}
+{% block content %}
+	<div class="page-header">
+	  <h1>{{ title }} <small>{{ author }}, {{ published }}</small></h1>
+	</div>
+	{% block content %}
+	{% endblock %}
+{% endblock %}
