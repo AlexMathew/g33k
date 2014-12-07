@@ -230,7 +230,7 @@ def search(type):
     return redirect(url_for(type + 'profile', username=searchterm))
 
 
-def generate_permalink(title, today):
+def generate_permalink(title, timestamp):
     import re
     title = title.strip()
     pattern = re.compile("[^\w ]")
@@ -268,7 +268,7 @@ def addtutorial():
     skillincrease = float(request.form['skillincrease'])
     title = request.form['title']
     date = datetime.date.today().ctime()
-    permalink = generate_permalink(title, timestamp)
+    permalink = generate_permalink(title, str(timestamp))
     content = request.form['content']
     html = convertmdtohtml(content)
     html = "{% extends \"tutorial.html\" %}\n{% block content %}\n" + html + "\n{% endblock %}"
@@ -305,7 +305,7 @@ def addtutorial():
         )
     print indexpage
     with open('templates/index.html', 'w') as f:
-        f.write()
+        f.write(indexpage)
     return redirect('index')
 
 
