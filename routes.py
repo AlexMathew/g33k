@@ -267,7 +267,7 @@ def addtutorial():
     category = request.form['category']
     skillincrease = float(request.form['skillincrease'])
     title = request.form['title']
-    date = datetime.date.today().ctime()
+    date = datetime.date.today().isoformat()
     permalink = generate_permalink(title, str(timestamp))
     content = request.form['content']
     html = convertmdtohtml(content)
@@ -296,14 +296,12 @@ def addtutorial():
         )
     with open('templates/index.html') as f:
         indexpage = f.read()
-    print indexpage
     indexpage = indexpage.replace(
         '<h3>G33K Activity</h3>',
         '<h3>G33K Activity</h3>\n<li class="list-group-item"> \
         <a href="/trainer/%s">%s</a> posted a new tutorial - \
         <a href="/%s">%s</a></li>' % (author_username, author_name, permalink, title)
         )
-    print indexpage
     with open('templates/index.html', 'w') as f:
         f.write(indexpage)
     return redirect('index')
