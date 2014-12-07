@@ -127,7 +127,11 @@ def verify_learnersignup():
 
 @app.route('/index')
 def index():
-	return render_template('index.html')
+	return render_template(
+		'index.html',
+		learner=(session['type']=="learner"),
+		trainer=(session['type']=="trainer")
+		)
 
 
 @app.route('/logout')
