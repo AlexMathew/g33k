@@ -38,15 +38,6 @@ def login_required(f):
             return redirect(url_for('home'))
         return f(*args, **kwargs)
     return function
-    
-
-def trainer_login_required(f):
-    @wraps(f)
-    def function(*args, **kwargs):
-        if session['type'] is not 'trainer':
-            return redirect(url_for('home'))
-        return f(*args, **kwargs)
-    return function
 
 
 @app.route('/')
@@ -260,9 +251,11 @@ def convertmdtohtml(content):
 
 
 @app.route('/addtutorial', methods=['GET', 'POST'])
-@trainer_login_required
+@login_required
 def addtutorial():
-    if request.method == 'GET':
+    if request.method != 'POST':
+        if session['type'] == "learner":
+            return redirect(url_for('index'))
         return render_template(
             'addtutorial.html',
             learner=(session['type']=="learner"),
@@ -299,16 +292,18 @@ def addtutorial():
     db.tutorials.insert(tutorial_data)
     db.trainers.update(
         { '_id': author_username },
-        { '$set': { 'tutorials': { '$push': trainer_data } } }
+        { '$push': { 'tutorials': trainer_data } }
         )
     with open('templates/index.html') as f:
         indexpage = f.read()
+    print indexpage
     indexpage = indexpage.replace(
         '<h3>G33K Activity</h3>',
         '<h3>G33K Activity</h3>\n<li class="list-group-item"> \
         <a href="/trainer/%s">%s</a> posted a new tutorial - \
         <a href="/%s">%s</a></li>' % (author_username, author_name, permalink, title)
         )
+    print indexpage
     with open('templates/index.html', 'w') as f:
         f.write()
     return redirect('index')
