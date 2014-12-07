@@ -185,7 +185,13 @@ def trainerprofile(username):
             'tutorials': person['tutorials'],
             'tutorialcount': len(person['tutorials'])
         }
-    return render_template('trainerprofile.html', error=error, details=details)
+    return render_template(
+        'trainerprofile.html', 
+        error=error, 
+        details=details,
+        learner=(session['type']=="learner"),
+        trainer=(session['type']=="trainer")
+        )
 
 
 @app.route('/learner/<username>')
@@ -201,7 +207,13 @@ def learnerprofile(username):
             'squadname': person['squadname'],
             'squad': person['squad']
         }
-    return render_template('learnerprofile.html', error=error, details=details)
+    return render_template(
+        'learnerprofile.html', 
+        error=error, 
+        details=details,
+        learner=(session['type']=="learner"),
+        trainer=(session['type']=="trainer")
+        )
 
 
 @app.route('/profile')
@@ -217,6 +229,7 @@ def search(type):
 
 
 @app.route('/logout')
+@login_required
 def logout():
     session.pop('username', None)
     session['type'] = 'unknown'

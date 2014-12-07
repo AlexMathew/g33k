@@ -1,14 +1,52 @@
 {% extends "template.html" %}
 {% block content %}
-<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
 	{% if error %}
 		<div class="alert alert-danger" role="alert">
 			No profile for {{ details['username'] }}.
 		</div>
 	{% else %}
 	<div class="page-header">
-  		<h1>{{ details['name'] }} <small>Coach of the {{ details['squadname'] }}</small></h1>
+  		<h1>{{ details['name'] }} <small>Coach of the squad "{{ details['squadname'] }}"</small></h1>
 	</div>
+	<h3>Squad members</h3>
+	<ul class="list-group">
+		{% for member in details['squad'] %}
+		<li class="list-group-item">
+			<h4>{{ member.name }}</h4>
+			<h6>Web</h6>
+			<div class="progress">
+			  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="{{ member['skills-web'] }}" aria-valuemin="0" aria-valuemax="10" style="width: {{ member['skills-web'] * 10 }}%">
+			    <span>{{ member['skills-web'] }}</span>
+			  </div>
+			</div>
+			<h6>Mobile</h6>
+			<div class="progress">
+			  <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="{{ member['skills-mobile'] }}" aria-valuemin="0" aria-valuemax="10" style="width: {{ member['skills-mobile'] * 10 }}%">
+			    <span>{{ member['skills-mobile'] }}</span>
+			  </div>
+			</div>
+			<h6>Design</h6>
+			<div class="progress">
+			  <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="{{ member['skills-design'] }}" aria-valuemin="0" aria-valuemax="10" style="width: {{ member['skills-design'] * 10 }}%">
+			    <span>{{ member['skills-design'] }}</span>
+			  </div>
+			</div>
+			<h6>Databases</h6>
+			<div class="progress">
+			  <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar" aria-valuenow="{{ member['skills-databases'] }}" aria-valuemin="0" aria-valuemax="10" style="width: {{ member['skills-databases'] * 10 }}%">
+			    <span>{{ member['skills-databases'] }}</span>
+			  </div>
+			</div>
+			<h6>Systems</h6>
+			<div class="progress">
+			  <div class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" aria-valuenow="{{ member['skills-systems'] }}" aria-valuemin="0" aria-valuemax="10" style="width: {{ member['skills-systems'] * 10 }}%">
+			    <span>{{ member['skills-systems'] }}</span>
+			  </div>
+			</div>
+		</li>
+		{% endfor %}
+	</ul>	
 	{% endif %}
-</div>
+
 {% endblock %}
