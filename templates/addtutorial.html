@@ -1,0 +1,34 @@
+{% extends "template.html" %}
+{% block content %}
+	
+	<h1 class="page-header">Add a new tutorial</h1>
+	You can add a new tutorial here. 
+	Give the title of the tutorial and select the radio button for the corresponding category. The "skill increase" specifies how much the skill for that category will increase when a squad member completes the tutorial (Put in only a realistic maximum of 4, but we won't stop you if you think it deserves more than that). The content of the tutorial is written in <a href="http://daringfireball.net/projects/markdown/"><b>Markdown</b></a>.
+	<div style="padding: 5px; margin: 5px">
+		<form action="{{ url_for('addtutorial') }}" method=post>
+			<div class="input-group">
+				<span class="input-group-addon">Title</span>
+				<input type="text" class="form-control" placeholder="New tutorial" name="title">
+			</div>
+			<div class="input-group">
+				<span class="input-group-addon">Category</span>
+				<label class="radio-inline"><input type="radio" name="category" value="web">Web</label>
+				<label class="radio-inline"><input type="radio" name="category" value="mobile">Mobile</label>
+				<label class="radio-inline"><input type="radio" name="category" value="design">Design</label>
+				<label class="radio-inline"><input type="radio" name="category" value="databases">Databases</label>
+				<label class="radio-inline"><input type="radio" name="category" value="systems">Systems</label>
+			</div>
+			<div class="input-group">
+				<span class="input-group-addon">Skill increase</span>
+				<input type="text" class="form-control" placeholder="0.0" name="skillincrease">
+			</div>
+			<div class="input-group">
+				<span class="input-group-addon">Content</span>
+				<textarea class="form-control" rows="10" id="content" name="content"></textarea>
+			</div>
+			<div style="padding:5px;margin:5px"></div>
+			<button class="button" style="width: 7em; height: 4em">Done</button>
+		</form>
+	</div>
+
+{% endblock %}

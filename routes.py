@@ -1,6 +1,8 @@
 from flask import Flask, render_template, redirect, request, session, \
                   flash, url_for 
-import os                 
+import os
+import time
+import datetime                 
 import pymongo
 import requests
 from functools import wraps
@@ -38,10 +40,19 @@ def login_required(f):
     return function
     
 
+def trainer_login_required(f):
+    @wraps(f)
+    def function(*args, **kwargs):
+        if session['type'] is not 'trainer':
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return function
+
+
 @app.route('/')
 def home():
     if 'username' in session:
-        return render_template('index.html')
+        return redirect(url_for('index'))
     session['type'] = 'unknown'
     return render_template('home.html')
 
@@ -226,6 +237,42 @@ def profile():
 def search(type):
     searchterm = request.form['term']
     return redirect(url_for(type + 'profile', username=searchterm))
+
+
+def generate_permalink(title, today):
+    import re
+    year, month, day = str(today.year), str(today.month), str(today.day)
+    title = title.strip()
+    pattern = re.compile("[^\w ]")
+    templink = re.sub(pattern, '', title).replace(" ", "_")
+    permalink = "_".join([year, month, day, templink])
+    return permalink
+
+
+def convertmdtohtml(content):
+    return html
+
+    
+@app.route('/addtutorial', methods=['GET', 'POST'])
+@trainer_login_required
+def addtutorial():
+    if request.method == 'GET':
+        return render_template(
+            'addtutorial.html',
+            learner=(session['type']=="learner"),
+            trainer=(session['type']=="trainer")
+            )
+    timestamp = int(time.time())
+    author_username = session["username"]
+    author_name = db.trainers.find_one({ '_id': author_username })['name']
+    category = request.form['category']
+    skillincrease = float(request.form['skillincrease'])
+    title = request.form['title']
+    today = datetime.date.today()
+    date = today.ctime()
+    permalink = generate_permalink(title, today)
+    content = request.form['content']
+    return redirect('index')
 
 
 @app.route('/logout')

@@ -14,6 +14,7 @@
 		{% for tutorial in details['tutorials'] %}
 			<li class="list-group-item">
 				<a href="{{ tutorial.link }}">{{ tutorial.title }}</a>
+				<p>Published : {{ tutorial.date }}</p>
 			</li>			
 		{% endfor %}
 	</ul>
