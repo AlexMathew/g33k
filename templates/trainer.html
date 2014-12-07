@@ -13,11 +13,22 @@
 				<div class="row">
 					<div class="col-sm-6 text-center">
 						<h1>I am a G33K Trainer</h3>
-						<form action="{{ url_for('auth_trainer') }}" method=post>
+						{% with messages = get_flashed_messages() %}
+						  {% if messages %}
+						    <ul class=flashes>
+						    {% for message in messages %}
+						      <div data-alert class="alert alert-danger">
+						      	{{ message }}
+						      </div>
+						    {% endfor %}
+						    </ul>
+						  {% endif %}
+						{% endwith %}						
+						<form action="{{ url_for('trainer') }}" method=post>
 							<label class="sr-only" for="inputUsername">Username</label>
-							<input id="inputUsername" class="form-control" type="username" autofocus="" required="" placeholder="Username">
+							<input id="inputUsername" class="form-control" type="username" autofocus="" required="" placeholder="Username" name="username">
 							<label class="sr-only" for="inputPassword">Password</label>
-							<input id="inputPassword" class="form-control" type="password" required="" placeholder="Password">
+							<input id="inputPassword" class="form-control" type="password" required="" placeholder="Password" name="password">
 							<div style="padding: 5px; margin: 5px"> </div>
 							<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 						</form>						

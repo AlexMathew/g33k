@@ -12,16 +12,39 @@ db = pymongo.Connection("mongodb://localhost").g33k
 def home():
 	if 'username' in session:
 		return render_template('index.html')
+	session['type'] = 'unknown'
 	return render_template('home.html')
 
 
-@app.route('/learner')
+@app.route('/learner', methods=['GET', 'POST'])
 def learner():
+	if request.method == 'POST':
+		username = request.form['username']
+		password = request.form['password']
+		user = db.learners.find_one({ '_id': username })
+		if user is not None and user['_id'] == username and user['password'] == hash(password):
+			session['username'] = username
+			session['type'] = 'learner'
+			return redirect('index')
+		else:
+			flash('Invalid username/password')
+			return redirect('learner')			
 	return render_template('learner.html')
 
 
-@app.route('/trainer')
+@app.route('/trainer', methods=['GET', 'POST'])
 def trainer():
+	if request.method == 'POST':
+		username = request.form['username']
+		password = request.form['password']
+		user = db.trainers.find_one({ '_id': username })
+		if user is not None and user['_id'] == username and user['password'] == hash(password):
+			session['username'] = username
+			session['type'] = 'trainer'
+			return redirect('index')
+		else:
+			flash('Invalid username/password')
+			return redirect('trainer')			
 	return render_template('trainer.html')
 
 
@@ -34,16 +57,6 @@ def trainer_signup():
 def learner_signup():
 	characters = db.characters.find()
 	return render_template('learner_signup.html', characters=characters)
-
-
-@app.route('/authenticate_trainer', methods=['POST'])
-def auth_trainer():
-	return render_template('home.html')
-
-
-@app.route('/authenticate_learner', methods=['POST'])
-def auth_learner():
-	return render_template('home.html')
 
 
 @app.route('/verify_trainersignup', methods=['POST'])
@@ -120,7 +133,7 @@ def index():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    session.pop('type', None)
+    session['type'] = 'unknown'
     return redirect(url_for('home'))
 
 
