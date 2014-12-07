@@ -2,10 +2,29 @@ from flask import Flask, render_template, redirect, request, session, escape, ur
 				  flash
 import os				  
 import pymongo
+import requests
 
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
 db = pymongo.Connection("mongodb://localhost").g33k
+
+
+def mailgun(email, type):
+    key = os.environ["MAILGUN_KEY"]
+    with open('data/welcomemail.txt') as f:
+    	text = f.read()
+    	text = text.replace("...type...", type)
+    r = requests.post(
+            "https://api.mailgun.net/v2/sandboxaafd9ee615e54f49af424db82ccf028a.mailgun.org/messages",
+            auth=("api", key),
+            data={
+                "from": "Alex Mathew <alexmathew003@gmail.com>",
+                "to": email,
+                "subject": "Welcome to G33K !",
+                "text": text
+            }
+        )
+    return
 
 
 @app.route('/')
@@ -73,6 +92,7 @@ def verify_trainersignup():
 			})
 		session['username'] = username
 		session['type'] = 'trainer'
+		mailgun(email, 'trainer')
 		return redirect('index')
 	else:
 		flash('The username "%s" is already taken' % (username))
@@ -122,6 +142,7 @@ def verify_learnersignup():
 			})
 		session['username'] = username
 		session['type'] = 'learner'
+		mailgun(email, 'learner')
 		return redirect('index')
 
 
