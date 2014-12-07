@@ -15,7 +15,7 @@ def genderize(name):
 
 
 def load_data():
-	with open('data/judges.json') as f:
+	with open('../data/judges.json') as f:
 		judges = json.load(f)
 	return judges
 
