@@ -153,7 +153,8 @@ def verify_learnersignup():
                     'skills-mobile': member['skills-mobile'],
                     'skills-design': member['skills-design'],
                     'skills-databases': member['skills-databases'],
-                    'skills-systems': member['skills-systems']
+                    'skills-systems': member['skills-systems'],
+                    'completedtutorials': []
                 }
                 for member in squadstats
                 ]
@@ -196,26 +197,51 @@ def trainerprofile(username):
         )
 
 
-@app.route('/learner/<username>')
+@app.route('/learner/<username>', methods=['GET', 'POST'])
 def learnerprofile(username):
-    person = db.learners.find_one({ '_id': username })
-    if person is None:
-        error = True
-        details = {'username': username}
-    else:
-        error = False
-        details = {
-            'name': person['name'],
-            'squadname': person['squadname'],
-            'squad': person['squad']
-        }
-    return render_template(
-        'learnerprofile.html', 
-        error=error, 
-        details=details,
-        learner=(session['type']=="learner"),
-        trainer=(session['type']=="trainer")
-        )
+    if request.method == 'GET':
+        person = db.learners.find_one({ '_id': username })
+        if person is None:
+            error = True
+            details = {'username': username}
+        else:
+            error = False
+            details = {
+                'name': person['name'],
+                'squadname': person['squadname'],
+                'squad': person['squad']
+            }
+        return render_template(
+            'learnerprofile.html', 
+            error=error, 
+            details=details,
+            learner=(session['type']=="learner"),
+            trainer=(session['type']=="trainer")
+            )
+    category = session['category']
+    skillincrease = session['skillincrease']
+    tutorial = session['tutorial']
+    member = request.form['category']
+    squad = db.learners.find_one({ '_id': username })['squad']
+    current_stat = filter(
+                    lambda x: x['name'] == member,
+                    squad
+                    )[0]['skills-' + category]
+    new_stat = current_stat + skillincrease
+    if new_stat > 10.0:
+        new_stat = 10.0
+    updatedsquad = []
+    for squadmember in squad:
+        person = squadmember
+        if person['name'] == member:
+            person['completedtutorials'].append(tutorial)
+            person['skills-' + category] = new_stat
+        updatedsquad.append(person)
+    db.learners.update({ '_id': username }, { '$set': { 'squad': updatedsquad } })
+    session.pop('category', None)
+    session.pop('skillincrease', None)
+    session.pop('tutorial', None)
+    return redirect(url_for('learnerprofile', username=session['username']))
 
 
 @app.route('/profile')
@@ -307,10 +333,42 @@ def addtutorial():
     return redirect('index')
 
 
-@app.route('/tutorial/<permalink>')
+@app.route('/tutorials/<permalink>')
 def tutorialpage(permalink):
-    templatename = str(db.tutorials.find_one({ 'permalink': permalink })['timestamp'])
-    return render_template('tutorials/' + templatename + '.html')
+    tutorial = db.tutorials.find_one({ 'permalink': permalink })
+    templatename = str(tutorial['timestamp'])
+    details = {
+        'title': tutorial['title'],
+        'author': tutorial['author_name'],
+        'username': tutorial['author_username'],
+        'published': tutorial['date'],
+        'skillincrease': tutorial['skillincrease'],
+        'category': tutorial['category']
+        }
+    if session['type'] == "learner":
+        learner = db.learners.find_one({ '_id': session['username'] })
+        squad = [
+                member 
+                for member in learner['squad'] 
+                if templatename not in member['completedtutorials'] 
+                ]
+        learnerdetails = {
+            'id': session['username'],
+            'squad': squad,
+            'squadname': learner['squadname']
+            }
+        session['category'] = tutorial['category']
+        session['skillincrease'] = tutorial['skillincrease']
+        session['tutorial'] = templatename
+    else:
+        learnerdetails = {}
+    return render_template(
+        'tutorials/' + templatename + '.html',
+        details=details,
+        learnerdetails=learnerdetails,
+        learner=(session['type']=="learner"),
+        trainer=(session['type']=="trainer")            
+        )
 
 
 @app.route('/catalogue')

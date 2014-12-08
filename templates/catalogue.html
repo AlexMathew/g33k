@@ -5,7 +5,7 @@
 		{% for tutorial in tutorials %}
 			<li class="list-group-item">
 				<a href="/tutorials/{{ tutorial.permalink }}">{{ tutorial.title }}</a>
-				<small>A {{ tutorial.category }} tutorial</small>
+				<span class="badge">{{ tutorial.category }}</span>
 				<small>
 					published by <a href="/trainer/{{ tutorial.author_username }}">{{ tutorial.author_name }}</a> 
 					on {{ tutorial.date }}

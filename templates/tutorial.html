@@ -1,8 +1,30 @@
 {% extends "template.html" %}
 {% block content %}
 	<div class="page-header">
-	  <h1>{{ title }} <small>{{ author }}, {{ published }}</small></h1>
+	  <h1>{{ details.title }} 
+	  <small>by <a href="/trainer/{{ details.username }}">{{ details.author }}</a>, 
+	  published on {{ details.published }}</small>
+	  </h1>
 	</div>
+
 	{% block content2 %}
 	{% endblock %}
+
+	{% if learner %}
+	<hr></hr>
+	<h3>Train a squad member</h3>
+	<h4>You've just completed a tutorial ! Will any member of {{ learnerdetails.squadname }} get a skill boost from this ?</h4>
+	<h4>Select a squad member who hasn't completed this tutorial before, and they will get a {{ details.skillincrease }} boost in their <strong>{{ details.category }}</strong> skill level.</h4>
+	<form action="{{ url_for('learnerprofile', username=details.username) }}" method=post>
+		<div class="input-group">
+			<span class="input-group-addon">Select a squad member</span>
+			{% for member in learnerdetails.squad %}
+				<label class="radio-inline"><input type="radio" name="category" value="{{ member.name }}">{{ member.name }} | {{ member['skills-' ~ details.category] }} {{ details.category|title }}</label>
+			{% endfor %}
+		</div>
+		<div style="padding:5px;margin:5px"></div>
+		<button class="button">Train</button>
+	</form>
+	{% endif %}
+
 {% endblock %}
