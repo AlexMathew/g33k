@@ -1,0 +1,16 @@
+{% extends "template.html" %}
+{% block content %}
+	<h1>Tutorial catalogue</h1>
+	<ul class="list-group">
+		{% for tutorial in tutorials %}
+			<li class="list-group-item">
+				<a href="/tutorials/{{ tutorial.permalink }}">{{ tutorial.title }}</a>
+				<small>A {{ tutorial.category }} tutorial</small>
+				<small>
+					published by <a href="/trainer/{{ tutorial.author_username }}">{{ tutorial.author_name }}</a> 
+					on {{ tutorial.date }}
+				</small>
+			</li>
+		{% endfor %}
+	</ul>
+{% endblock %}

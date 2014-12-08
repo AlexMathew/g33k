@@ -271,7 +271,7 @@ def addtutorial():
     permalink = generate_permalink(title, str(timestamp))
     content = request.form['content']
     html = convertmdtohtml(content)
-    html = "{% extends \"tutorial.html\" %}\n{% block content %}\n" + html + "\n{% endblock %}"
+    html = "{% extends \"tutorial.html\" %}\n{% block content2 %}\n" + html + "\n{% endblock %}"
     with open('templates/tutorials/' + str(timestamp) + '.html', 'w') as f:
         f.write(html)
     trainer_data = {
@@ -300,11 +300,28 @@ def addtutorial():
         '<h3>G33K Activity</h3>',
         '<h3>G33K Activity</h3>\n<li class="list-group-item"> \
         <a href="/trainer/%s">%s</a> posted a new tutorial - \
-        <a href="/%s">%s</a></li>' % (author_username, author_name, permalink, title)
+        <a href="/tutorial/%s">%s</a></li>' % (author_username, author_name, permalink, title)
         )
     with open('templates/index.html', 'w') as f:
         f.write(indexpage)
     return redirect('index')
+
+
+@app.route('/tutorial/<permalink>')
+def tutorialpage(permalink):
+    templatename = str(db.tutorials.find_one({ 'permalink': permalink })['timestamp'])
+    return render_template('tutorials/' + templatename + '.html')
+
+
+@app.route('/catalogue')
+def catalogue():
+    tutorials = [tut for tut in db.tutorials.find().sort([('timestamp', pymongo.DESCENDING)])]
+    return render_template(
+        'catalogue.html',
+        tutorials=tutorials,
+        learner=(session['type']=="learner"),
+        trainer=(session['type']=="trainer")        
+        )
 
 
 @app.route('/logout')
@@ -316,4 +333,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", debug=True)
