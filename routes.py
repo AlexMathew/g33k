@@ -6,6 +6,7 @@ import datetime
 import pymongo
 import requests
 from functools import wraps
+from jinja2 import Template
 
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
@@ -16,8 +17,8 @@ def mailgun(email, name, type):
     key = os.environ["MAILGUN_KEY"]
     with open('data/welcomemail.txt') as f:
         text = f.read()
-        text = text.replace("...type...", type)
-        text = text.replace("...name...", name)
+    template = Template(text)
+    rendered = template.render({ 'name': name, 'type': type })
     r = requests.post(
             "https://api.mailgun.net/v2/sandboxaafd9ee615e54f49af424db82ccf028a.mailgun.org/messages",
             auth=("api", key),
@@ -25,7 +26,7 @@ def mailgun(email, name, type):
                 "from": "Alex Mathew <alexmathew003@gmail.com>",
                 "to": email,
                 "subject": "Welcome to G33K !",
-                "text": text
+                "text": rendered
             }
         )
     return
